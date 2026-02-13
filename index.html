@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>言語判定ツール</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 言語判定ツール</h1>
+        <textarea id="textInput" placeholder="判定したい文字を入力..." rows="6"></textarea>
+        <button id="detectBtn" onclick="detectLanguage()">判定する</button>
+        <div id="result" style="display: none; margin-top: 20px; padding: 20px; border-radius: 10px; background: white;">
+            <div id="resultContent"></div>
+        </div>
+    </div>
+    <script>
+        async function detectLanguage() {
+            const text = document.getElementById('textInput').value.trim();
+            if (!text) return alert('入力してください');
+            const res = await fetch('/detect', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+            const data = await res.json();
+            document.getElementById('resultContent').innerHTML = `
+                <h2>判定：${data.language.toUpperCase()}</h2>
+                <p>信頼度: ${Math.round(data.confidence)}%</p>
+                <p>${data.details}</p>`;
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
